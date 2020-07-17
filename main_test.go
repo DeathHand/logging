@@ -1,6 +1,9 @@
 package logging
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestNew(t *testing.T) {
 	SetLevel(LogLevelInfo)
@@ -27,6 +30,11 @@ func TestWarning(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
+	Error("Error test: %s", "test")
+}
+
+func TestLogger_SetTimeFormat(t *testing.T) {
+	SetTimeFormat(time.RFC822Z)
 	Error("Error test: %s", "test")
 }
 

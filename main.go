@@ -2,43 +2,39 @@ package logging
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"time"
 )
 
 const (
-	LogLevelDebug    int = 1
-	LogLevelInfo     int = 2
-	LogLevelWarning  int = 3
-	LogLevelError    int = 4
-	LogLevelCritical int = 5
+	LogLevelDebug   int = 1
+	LogLevelInfo    int = 2
+	LogLevelWarning int = 3
 )
 
 var logLevel = LogLevelDebug
+var timeFormat = time.RFC3339Nano
 
 // SetLevel logging level setter
 func SetLevel(level int) {
 	logLevel = level
 }
 
+// SetTimeFormat change time format
+func SetTimeFormat(layout string) {
+	timeFormat = layout
+}
+
 // Logger main structure
 type Logger struct {
-	debugLogger    *log.Logger
-	infoLogger     *log.Logger
-	warningLogger  *log.Logger
-	errorLogger    *log.Logger
-	criticalLogger *log.Logger
+	prefix string
 }
 
 // Logger constructor
 func New(prefix string) *Logger {
-	l := new(Logger)
-	l.debugLogger = log.New(os.Stdout, fmt.Sprintf("[%s] DEBUG: ", prefix), log.Ldate|log.Ltime)
-	l.infoLogger = log.New(os.Stdout, fmt.Sprintf("[%s] INFO: ", prefix), log.Ldate|log.Ltime)
-	l.warningLogger = log.New(os.Stdout, fmt.Sprintf("[%s] WARNING: ", prefix), log.Ldate|log.Ltime)
-	l.errorLogger = log.New(os.Stderr, fmt.Sprintf("[%s] ERROR: ", prefix), log.Ldate|log.Ltime)
-	l.criticalLogger = log.New(os.Stderr, fmt.Sprintf("[%s] CRITICAL: ", prefix), log.Ldate|log.Ltime)
-	return l
+	return &Logger{
+		prefix: prefix,
+	}
 }
 
 // Debug print DEBUG message
@@ -46,7 +42,9 @@ func (l *Logger) Debug(message string, v ...interface{}) {
 	if logLevel > LogLevelDebug {
 		return
 	}
-	l.debugLogger.Printf(message, v...)
+	_, _ = fmt.Fprintln(
+		os.Stdout,
+		fmt.Sprintf("%s: [%s] DEBUG: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
 }
 
 // Info print INFO message
@@ -54,7 +52,7 @@ func (l *Logger) Info(message string, v ...interface{}) {
 	if logLevel > LogLevelInfo {
 		return
 	}
-	l.infoLogger.Printf(message, v...)
+	_, _ = fmt.Fprintln(os.Stdout, fmt.Sprintf("%s: [%s] INFO: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
 }
 
 // Warning print WARNING message
@@ -62,20 +60,18 @@ func (l *Logger) Warning(message string, v ...interface{}) {
 	if logLevel > LogLevelWarning {
 		return
 	}
-	l.warningLogger.Printf(message, v...)
+	_, _ = fmt.Fprintln(os.Stdout, fmt.Sprintf("%s: [%s] WARNING: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
 }
 
 // Error print ERROR message
 func (l *Logger) Error(message string, v ...interface{}) {
-	if logLevel > LogLevelError {
-		return
-	}
-	l.errorLogger.Printf(message, v...)
+	_, _ = fmt.Fprintln(os.Stderr, fmt.Sprintf("%s: [%s] ERROR: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
 }
 
 // Critical print CRITICAL message and exit
 func (l *Logger) Critical(message string, v ...interface{}) {
-	l.criticalLogger.Fatalf(message, v...)
+	_, _ = fmt.Fprintln(os.Stderr, fmt.Sprintf("%s: [%s] CRITICAL: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
+	os.Exit(1)
 }
 
 // main logger

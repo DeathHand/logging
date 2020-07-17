@@ -42,9 +42,7 @@ func (l *Logger) Debug(message string, v ...interface{}) {
 	if logLevel > LogLevelDebug {
 		return
 	}
-	_, _ = fmt.Fprintln(
-		os.Stdout,
-		fmt.Sprintf("%s: [%s] DEBUG: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
+	_, _ = fmt.Fprintln(os.Stdout, fmt.Sprintf("%s: [%s] DEBUG: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
 }
 
 // Info print INFO message

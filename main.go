@@ -69,7 +69,6 @@ func (l *Logger) Error(message string, v ...interface{}) {
 // Critical print CRITICAL message and exit
 func (l *Logger) Critical(message string, v ...interface{}) {
 	_, _ = fmt.Fprintln(os.Stderr, fmt.Sprintf("%s: [%s] CRITICAL: %s", time.Now().Format(timeFormat), l.prefix, fmt.Sprintf(message, v...)))
-	os.Exit(1)
 }
 
 // main logger
